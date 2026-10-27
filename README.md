@@ -4,12 +4,14 @@
 
 这是一个约 90 秒一局的双席位协作游戏：你操作玩家角色，自己的 AI 通过 MCP 观察局面、选择任务并操作队友角色。游戏负责移动、切配、烹饪与计分，AI 负责决定下一步做什么。
 
+**体验入口：**[网页试玩](https://lan1234562024-eng.github.io/pumpkin-kitchen/) · [下载完整本地版 ZIP](https://github.com/lan1234562024-eng/pumpkin-kitchen/archive/refs/heads/main.zip) · [查看代码仓库](https://github.com/lan1234562024-eng/pumpkin-kitchen)
+
 ## 先选一种体验
 
 | 方式 | 适合谁 | 需要什么 |
 |---|---|---|
-| 网页试玩 | 想立即体验操作与玩法 | 打开参赛页提供的试玩链接；队友由规则驱动，页面明确标注 |
-| 完整本地版 | 想邀请自己的 AI 加入 | 下载本仓库代码，准备 Node.js 24 或更新版本，以及支持 MCP 的 AI 客户端 |
+| 网页试玩 | 想立即体验操作与玩法 | [打开网页试玩](https://lan1234562024-eng.github.io/pumpkin-kitchen/)；队友由规则驱动，页面明确标注 |
+| 完整本地版 | 想邀请自己的 AI 加入 | [下载完整本地版 ZIP](https://github.com/lan1234562024-eng/pumpkin-kitchen/archive/refs/heads/main.zip)，准备 Node.js 24 或更新版本，以及支持 MCP 的 AI 客户端 |
 
 网页试玩中的演示队友**不是大模型**。真实 AI 接入使用完整本地版；网页试玩不提供远程 AI 服务，也不要求填写模型 API 密钥。
 
