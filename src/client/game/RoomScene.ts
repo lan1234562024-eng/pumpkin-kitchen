@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { artUrl, watchArtLoading, type ArtLoadState } from './art-loading';
 import type { GameSnapshot, Point, SeatId, StationId, SemanticAction, KitchenItem, IngredientItem } from '../../shared/contracts';
 import { WORLD, STATION_IDS, KITCHEN_RULES } from '../../game/world';
 import { KITCHEN_LAYOUT } from '../../game/kitchen-layout';
@@ -59,9 +60,12 @@ class RoomPhaserScene extends Phaser.Scene {
     private counterLayer?: Phaser.GameObjects.Image;
     private counterTextureKey?: string;
     private motionChanged = (event: MediaQueryListEvent) => { this.reducedMotion = event.matches; this.clearEffects(); this.clearItemTravel(); };
-    constructor(private move: MoveHandler) { super({ key: 'room' }); }
+    constructor(private move: MoveHandler, private onArtLoad?: (state: ArtLoadState) => void) { super({ key: 'room' }); }
     preload() {
-        const assetUrl = (url: string) => `${import.meta.env.BASE_URL}${url.replace(/^\//, '')}`;
+        const assetUrl = (url: string) => artUrl(url, import.meta.env.BASE_URL, import.meta.env.MODE, import.meta.env.PROD);
+        const dispose = watchArtLoading(this.load, state => this.onArtLoad?.(state));
+        this.events.once(Phaser.Scenes.Events.SHUTDOWN, dispose);
+        this.events.once(Phaser.Scenes.Events.DESTROY, dispose);
         this.load.image(ARTWORK.kitchen.key, assetUrl(ARTWORK.kitchen.url));
         this.load.image(ARTWORK.characters.key, assetUrl(ARTWORK.characters.url));
         for (const art of Object.values(KITCHEN_ART)) this.load.image(art.key, assetUrl(art.url));
@@ -481,7 +485,7 @@ export interface RoomGame {
     setActionsEnabled(enabled: boolean): void;
     destroy(): void;
 }
-export function mountRoomGame(container: HTMLElement, onIntent: (action: SemanticAction, seat: SeatId) => void, onFrame?: (duration: number) => void): RoomGame {
+export function mountRoomGame(container: HTMLElement, onIntent: (action: SemanticAction, seat: SeatId) => void, onFrame?: (duration: number) => void, onArtLoad?: (state: ArtLoadState) => void): RoomGame {
     let snapshot: GameSnapshot | undefined, seat: SeatId = 'human', enabled = false, scene: RoomPhaserScene | undefined;
     let frameStartedAt: number | undefined;
     const beginFrame = () => { frameStartedAt = performance.now(); };
@@ -503,7 +507,7 @@ export function mountRoomGame(container: HTMLElement, onIntent: (action: Semanti
         }
         onIntent({ type: 'move_to', target }, seat);
     };
-    const game = new Phaser.Game({ type: Phaser.AUTO, parent: container, width: 800, height: WORLD.height + SCENE_HEADROOM, backgroundColor: '#f7edda', scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH, width: 800, height: WORLD.height + SCENE_HEADROOM }, render: { antialias: true, roundPixels: true }, scene: [new RoomPhaserScene(move)], callbacks: { postBoot: instance => { instance.events.on(Phaser.Core.Events.PRE_STEP, beginFrame); instance.events.on(Phaser.Core.Events.POST_RENDER, endFrame); scene = instance.scene.getScene('room') as RoomPhaserScene; scene.setActionsEnabled(enabled); if (snapshot)
+    const game = new Phaser.Game({ type: Phaser.AUTO, parent: container, width: 800, height: WORLD.height + SCENE_HEADROOM, backgroundColor: '#f7edda', scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH, width: 800, height: WORLD.height + SCENE_HEADROOM }, render: { antialias: true, roundPixels: true }, loader: { timeout: 15000 }, scene: [new RoomPhaserScene(move, onArtLoad)], callbacks: { postBoot: instance => { instance.events.on(Phaser.Core.Events.PRE_STEP, beginFrame); instance.events.on(Phaser.Core.Events.POST_RENDER, endFrame); scene = instance.scene.getScene('room') as RoomPhaserScene; scene.setActionsEnabled(enabled); if (snapshot)
                 scene.setSnapshot(snapshot); } } });
     return { setSnapshot(s) { snapshot = s; scene?.setSnapshot(s); }, setControlSeat(id) { seat = id; }, setActionsEnabled(value) { enabled = value; scene?.setActionsEnabled(value); }, destroy() { enabled = false; snapshot = undefined; scene = undefined; game.events.off(Phaser.Core.Events.PRE_STEP, beginFrame); game.events.off(Phaser.Core.Events.POST_RENDER, endFrame); game.destroy(true); container.replaceChildren(); } };
 }

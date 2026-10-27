@@ -12,7 +12,7 @@
     "mcp": "node --import tsx src/mcp/stdio.ts",
     "build": "tsc --noEmit && vite build",
     "dev:demo": "vite --mode demo --host 127.0.0.1",
-    "build:demo": "tsc --noEmit && vite build --mode demo",
+    "build:demo": "tsc --noEmit && vite build --mode demo && node scripts/optimize-demo-art.mjs",
     "preview:demo": "vite preview --mode demo --host 127.0.0.1"
   },
   "dependencies": {
@@ -29,6 +29,7 @@
     "@types/react-dom": "^19.2.0",
     "@types/ws": "^8.18.1",
     "concurrently": "^9.2.1",
+    "sharp": "0.35.5",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3",
     "vite": "^7.1.12",
@@ -38,4 +39,3 @@
     "node": ">=24"
   }
 }
-
