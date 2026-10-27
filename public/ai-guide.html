@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>和自己的 AI 一起玩 · 南瓜厨房</title>
+  <style>
+    :root { color-scheme: dark; --bg:#171d22; --card:#222b31; --ink:#f3eee5; --muted:#bdc6c8; --accent:#f2bd74; --line:#435057; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--ink); font-family:system-ui,-apple-system,"Segoe UI",sans-serif; line-height:1.8; }
+    main { width:min(880px,100% - 36px); margin:0 auto; padding:40px 0 64px; }
+    a { color:var(--accent); text-underline-offset:4px; }
+    a:focus-visible,button:focus-visible { outline:3px solid var(--accent); outline-offset:5px; }
+    .back { display:inline-block; margin-bottom:32px; }
+    .eyebrow { color:var(--accent); font-size:.85rem; letter-spacing:.12em; margin:0; }
+    h1 { font-size:clamp(1.9rem,5vw,3rem); line-height:1.25; margin:14px 0; }
+    h2 { margin:0 0 12px; font-size:1.22rem; }
+    p { margin:0 0 14px; }
+    .intro { color:var(--muted); max-width:45rem; }
+    .cards { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:30px 0; }
+    .card,section { background:var(--card); border:1px solid var(--line); border-radius:20px; padding:24px; }
+    .card p:last-child,section p:last-child { margin-bottom:0; }
+    .tag { display:inline-block; color:var(--accent); margin-bottom:10px; font-size:.88rem; }
+    section { margin-top:18px; }
+    ol,ul { margin:0; padding-left:1.4rem; }
+    li+li { margin-top:10px; }
+    code { font-family:ui-monospace,"Cascadia Code",monospace; color:#f5d3a5; overflow-wrap:anywhere; }
+    .prompt { border-left:3px solid var(--accent); margin:18px 0; padding:12px 18px; background:#192126; border-radius:0 12px 12px 0; }
+    .note { font-size:.92rem; color:var(--muted); }
+    footer { color:var(--muted); font-size:.9rem; padding-top:28px; }
+    @media(max-width:620px) { main { padding-top:24px; } .cards { grid-template-columns:1fr; } .card,section { padding:20px; } }
+  </style>
+</head>
+<body>
+  <main>
+    <a class="back" href="./">← 返回厨房</a>
+    <p class="eyebrow">南瓜厨房 · AI 接入指南</p>
+    <h1>邀请你的 AI 来当队友</h1>
+    <p class="intro">网页里先玩一局，熟悉接单、备菜和交付。想和自己的 AI 配合时，下载完整本地版，把接入指南交给它。</p>
+
+    <div class="cards">
+      <article class="card">
+        <span class="tag">打开就能玩</span>
+        <h2>网页试玩</h2>
+        <p>队友按预设规则行动，不调用大模型。无需安装、无需账号配置，适合先熟悉厨房。</p>
+      </article>
+      <article class="card">
+        <span class="tag">自己的 AI，自己的搭档</span>
+        <h2>完整本地版</h2>
+        <p>AI 通过 MCP 看见局面、选择任务，操作自己的角色。首次需要准备运行环境与客户端连接。</p>
+      </article>
+    </div>
+
+    <section>
+      <h2>把准备工作交给 AI</h2>
+      <ol>
+        <li>从参赛页的代码仓库链接下载完整代码并解压。</li>
+        <li>找到根目录中的 <code>AI-START-HERE.md</code>，交给能读取文件、操作本地终端的 AI。</li>
+        <li>发送下面这段话，按提示完成只有你能操作的步骤。</li>
+      </ol>
+      <blockquote class="prompt">请先阅读 AI-START-HERE.md，检查环境，完成本地启动和 MCP 接入。需要我操作的步骤再提醒我；连接成功后停在大厅，等我开始游戏。</blockquote>
+      <p class="note">如果 AI 只能聊天，它仍可以照着说明指导你。详细连接方式位于代码包内的 <code>docs/AI-CONNECTIONS.md</code>。</p>
+    </section>
+
+    <section>
+      <h2>连接之后怎么开始</h2>
+      <ol>
+        <li>AI 先检查实际规则和局面，再确认自己已取得队友席位。</li>
+        <li>你在本地游戏页面点击“开始一局”，随后告诉 AI“开了”。</li>
+        <li>AI 取得新回合上下文，你们就能分别接单、处理食材和交付。</li>
+      </ol>
+      <p class="note" style="margin-top:16px">你随时可以接管队友或停止游戏。开新局时需要重新取得当局控制信息。</p>
+    </section>
+
+    <section>
+      <h2>两件需要知道的事</h2>
+      <p>网页试玩和你的本地厨房各自运行。网页试玩不会自动连接到你的 AI，也不提供后台托管模型。</p>
+      <p>模型思考、工具审批和连接延迟可能带来动作间空档。云端客户端需要你自己的受保护通道；请按完整指南配置，不要公开账号凭据或关闭身份验证。</p>
+    </section>
+    <footer>两种体验，同一间南瓜厨房。一起接单，一起开饭。</footer>
+  </main>
+</body>
+</html>

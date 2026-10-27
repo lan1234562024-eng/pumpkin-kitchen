@@ -1,0 +1,41 @@
+{
+  "name": "pumpkin-kitchen",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "dev": "concurrently -k -P \"npm run dev:client -- {@}\" \"npm:dev:server\" --",
+    "dev:client": "vite --host 127.0.0.1",
+    "dev:server": "tsx watch src/server/index.ts",
+    "mcp": "node --import tsx src/mcp/stdio.ts",
+    "build": "tsc --noEmit && vite build",
+    "dev:demo": "vite --mode demo --host 127.0.0.1",
+    "build:demo": "tsc --noEmit && vite build --mode demo",
+    "preview:demo": "vite preview --mode demo --host 127.0.0.1"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.1",
+    "phaser": "^3.90.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "ws": "^8.18.3",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@types/ws": "^8.18.1",
+    "concurrently": "^9.2.1",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.12",
+    "vitest": "^3.2.4"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}
+
