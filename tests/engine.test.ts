@@ -118,6 +118,57 @@ describe('deterministic game core',()=>{
     expect(s.score).toBeGreaterThan(0);
     s=setController(s,'ai','human',60000);expect(chooseDemoCommand(s,60000)).toBeNull();
   });
+  it('demo recovers a chopped cucumber without a bowl and finishes plating',()=>{
+    let s=startRound(createGame(0),0);
+    s.orders[0].phase='accepted';s.orders[0].recipe_id='pumpkin_salad';s.orders[0].delivery_deadline_ms=40000;
+    s.items.cucumber={id:'cucumber',kind:'ingredient',ingredient:'cucumber',preparation:'chopped',chop_remaining_ms:0};
+    s.seats.ai.held_item_id='cucumber';
+    const doAt=(target:StationId)=>{
+      s.seats.ai.position=approachFor(s.seats.ai.position,target)!;
+      const c=chooseDemoCommand(s,s.server_time_ms);
+      expect(c?.action).toEqual({type:'interact',target});
+      const result=applyCommand(s,c!,s.server_time_ms);
+      expect(result.receipt.status).toBe('accepted');
+      s=result.state;
+    };
+    doAt('counter_left');
+    expect(s.slots.counter_left).toBe('cucumber');
+    doAt('plates');
+    expect(s.items[s.seats.ai.held_item_id!]).toMatchObject({kind:'plate',contents:[]});
+    doAt('counter_left');
+    expect(s.items[s.seats.ai.held_item_id!]).toMatchObject({kind:'plate',contents:['cucumber']});
+    s.items.pumpkin={id:'pumpkin',kind:'ingredient',ingredient:'pumpkin',preparation:'cooked',chop_remaining_ms:0};
+    const pot=s.items[s.slots.burner_a!] as import('../src/shared/contracts').PotItem;
+    pot.phase='cooked_pumpkin';pot.contents=['pumpkin'];
+    doAt('burner_a');
+    expect(s.items[s.seats.ai.held_item_id!]).toMatchObject({recipe_id:'pumpkin_salad'});
+    doAt('delivery');
+    expect(s.score).toBe(1);
+  });
+  it('demo chooses a compatible plate instead of getting stuck at the first incompatible one',()=>{
+    const s=startRound(createGame(0),0);
+    s.items.cucumber={id:'cucumber',kind:'ingredient',ingredient:'cucumber',preparation:'chopped',chop_remaining_ms:0};
+    s.items.other={id:'other',kind:'ingredient',ingredient:'cucumber',preparation:'chopped',chop_remaining_ms:0};
+    s.items.duplicate={id:'duplicate',kind:'plate',contents:['other'],recipe_id:null};
+    s.items.empty={id:'empty',kind:'plate',contents:[],recipe_id:null};
+    s.slots.counter_left='duplicate';s.slots.counter_right='empty';
+    s.seats.ai.held_item_id='cucumber';
+    s.seats.ai.position=approachFor(s.seats.ai.position,'counter_right')!;
+    expect(chooseDemoCommand(s,0)?.action).toEqual({type:'interact',target:'counter_right'});
+  });
+  it('demo parks a half-filled plate and continues with pumpkin preparation',()=>{
+    let s=startRound(createGame(0),0);
+    s.orders[0].phase='accepted';s.orders[0].recipe_id='pumpkin_salad';s.orders[0].delivery_deadline_ms=40000;
+    s.items.cucumber={id:'cucumber',kind:'ingredient',ingredient:'cucumber',preparation:'chopped',chop_remaining_ms:0};
+    s.items.plate={id:'plate',kind:'plate',contents:['cucumber'],recipe_id:null};
+    s.seats.ai.held_item_id='plate';
+    s.seats.ai.position=approachFor(s.seats.ai.position,'counter_left')!;
+    const c=chooseDemoCommand(s,0);
+    expect(c?.action).toEqual({type:'interact',target:'counter_left'});
+    s=applyCommand(s,c!,0).state;
+    s.seats.ai.position=approachFor(s.seats.ai.position,'source_pumpkin')!;
+    expect(chooseDemoCommand(s,0)?.action).toEqual({type:'interact',target:'source_pumpkin'});
+  });
   it('rejects reused IDs even when replacement content is malformed, and rejects unknown fields',()=>{
     const s=startRound(createGame(0),0), c=command(s,'human',{type:'cancel'});
     const accepted=applyCommand(s,c,0).state;
